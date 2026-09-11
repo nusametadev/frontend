@@ -48,16 +48,37 @@ Never use raw color values (hex, RGB, HSL). Always reference a token. Three sour
 
    Common groups: `text.*`, `bg.*`, `border.*`, `icon.*`, `link.*`, `button.*`, `badge.*`.
 
-2. **Project color palette** — scale and alpha colors defined in `src/toolkit/theme/foundations/colors.ts`: `gray`, `blue`, `red`, `orange`, `yellow`, `green`, `teal`, `cyan`, `purple`, `pink` (steps 50–900), `black`, `white`, `whiteAlpha.*`, `blackAlpha.*`.
+2. **Project color palette** — scale and alpha colors defined in `src/toolkit/theme/foundations/colors.ts`: `gray`, `blue`, `red`, `primaryRed`, `orange`, `yellow`, `green`, `teal`, `cyan`, `purple`, `pink` (steps 50–900), `black`, `white`, `whiteAlpha.*`, `blackAlpha.*`.
 
    ```tsx
    <Box bg="blue.50" color="gray.700" />
    ```
 
+   Two of these carry Nagara brand values and are defined in
+   `src/toolkit/theme/foundations/brandColors.ts` rather than inline:
+
+   - `primaryRed` is the **brand** red (`primaryRed.500` = `#E31E26`) — links, active
+     navigation, primary buttons, chart lines. `red` is **not** a brand colour: it keeps
+     Blockscout's values and its error/danger meaning. Never reach for `red` to express
+     the brand, or for `primaryRed` to express an error. Note two things about its shape:
+     it has **no `50`**, and `primaryRed.100` is plain **white** — that is the design
+     system's own ramp, not a mistake. Steps `600`–`900` are local extensions, not canon.
+   - `gray` is Nagara's warm-neutral scale, mapped step-for-step onto
+     `neutral-100..900`. Only `gray.50` is interpolated, since Nagara's scale has no
+     50. The values are warm, so they will not match Chakra's blue-tinted defaults.
+
 3. **Brand colors** — also defined in `src/toolkit/theme/foundations/colors.ts`: `github`, `telegram`, `linkedin`, `discord`, `slack`, `twitter`, `opensea`, `facebook`, `medium`, `reddit`, `celo`, `clusters`.
 
    ```tsx
    <Icon color="github" />
+   ```
+
+   Nagara's tertiary accents live alongside them as `tertiary.orange` (`#E63E00`),
+   `tertiary.pink` (`#F8BBCA`) and `tertiary.burgundy` (`#9B2710`) — flat named colours
+   with no steps, defined in `brandColors.ts`.
+
+   ```tsx
+   <Box borderColor="tertiary.orange" />
    ```
 
 If a raw color value is truly unavoidable (e.g. a third-party embed), leave a comment explaining why.

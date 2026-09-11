@@ -4,19 +4,37 @@ import { defaultsDeep } from 'es-toolkit/compat';
 
 import config from 'src/config';
 
+import { gray, primaryRed, surface, tertiary } from './brandColors';
+
+/**
+ * Nagara's theme layer.
+ *
+ * Values are taken from the Nagara Explorer design (Figma) and expressed with
+ * the brand scales in ./brandColors, so there are almost no literals here.
+ *
+ * Keep this object structurally identical to upstream — same keys, same
+ * nesting, only the values differ. A new theme role added upstream then shows
+ * up as an ordinary merge conflict instead of being silently dropped.
+ *
+ * `_dark` is changed only where the value carried Blockscout's blue brand.
+ * Nagara is a light-only design with no opinion on dark surfaces, but a blue
+ * brand would be plainly wrong if a reader switches to a dark theme.
+ */
 const DEFAULT_THEME_COLORS = {
   bg: {
     primary: {
       // for some reason links to colors.white and colors.black variables are not working here
       // so we use hex values instead
       // but it is not the case for other colors
-      _light: { value: '#FFFFFF' }, // colors.white
+      _light: { value: '#F7F7F8' }, // Nagara page tint, = gray.100
       _dark: { value: '#101112' }, // colors.black
     },
   },
   text: {
     primary: {
-      _light: { value: '{colors.blackAlpha.800}' },
+      // Nagara sets body text to a solid #1D1D1F. blackAlpha.800 would
+      // composite to a noticeably lighter grey over the tinted page.
+      _light: { value: '{colors.gray.900}' },
       _dark: { value: '{colors.whiteAlpha.800}' },
     },
     secondary: {
@@ -25,41 +43,44 @@ const DEFAULT_THEME_COLORS = {
     },
   },
   hover: {
-    _light: { value: '{colors.blue.400}' },
-    _dark: { value: '{colors.blue.400}' },
+    // Nagara turns interactive elements brand-red on hover. A step darker than
+    // the brand, so links — already red — still change visibly.
+    _light: { value: '{colors.primaryRed.600}' },
+    _dark: { value: '{colors.primaryRed.400}' },
   },
   selected: {
     control: {
       text: {
-        _light: { value: '{colors.blue.700}' },
+        _light: { value: '{colors.primaryRed.500}' },
         _dark: { value: '{colors.gray.50}' },
       },
       bg: {
-        _light: { value: '{colors.blue.50}' },
+        _light: { value: '{colors.primaryRed.200}' },
         _dark: { value: '{colors.whiteAlpha.50}' },
       },
     },
     option: {
+      // Filled selected option — Nagara's segmented control is solid brand red.
       bg: {
-        _light: { value: '{colors.blue.500}' },
-        _dark: { value: '{colors.blue.500}' },
+        _light: { value: '{colors.primaryRed.500}' },
+        _dark: { value: '{colors.primaryRed.500}' },
       },
     },
   },
   icon: {
     primary: {
-      _light: { value: '{colors.gray.500}' },
+      _light: { value: '{colors.gray.600}' }, // Nagara #3D3F44
       _dark: { value: '{colors.gray.400}' },
     },
     secondary: {
-      _light: { value: '{colors.gray.400}' },
+      _light: { value: '{colors.gray.500}' }, // Nagara #797D86
       _dark: { value: '{colors.gray.500}' },
     },
   },
   button: {
     primary: {
-      _light: { value: '{colors.blue.600}' },
-      _dark: { value: '{colors.blue.600}' },
+      _light: { value: '{colors.primaryRed.500}' },
+      _dark: { value: '{colors.primaryRed.400}' },
       text: {
         _light: { value: '{colors.white}' },
         _dark: { value: '{colors.white}' },
@@ -67,58 +88,72 @@ const DEFAULT_THEME_COLORS = {
     },
   },
   link: {
+    // Block numbers, hashes and addresses throughout the design.
     primary: {
-      _light: { value: '{colors.blue.600}' },
-      _dark: { value: '{colors.blue.300}' },
+      _light: { value: '{colors.primaryRed.500}' },
+      _dark: { value: '{colors.primaryRed.300}' },
     },
   },
   graph: {
     line: {
-      _light: { value: '{colors.blue.500}' },
-      _dark: { value: '{colors.blue.200}' },
+      _light: { value: '{colors.primaryRed.500}' },
+      _dark: { value: '{colors.primaryRed.300}' },
     },
+    // Nagara's chart is a bare line: no area fill. Both stops are fully
+    // transparent rather than removed, because the <linearGradient> is still
+    // rendered and needs two valid colour stops.
     gradient: {
       start: {
-        _light: { value: 'rgba(144, 205, 244, 0.3)' }, // blue.200 with opacity 0.3
-        _dark: { value: 'rgba(144, 205, 244, 0.3)' }, // blue.200 with opacity 0.3
+        _light: { value: 'rgba(227, 30, 38, 0)' }, // primaryRed.500, no fill
+        _dark: { value: 'rgba(227, 30, 38, 0)' }, // primaryRed.500, no fill
       },
       stop: {
-        _light: { value: 'rgba(144, 205, 244, 0)' }, // blue.200 with opacity 0
-        _dark: { value: 'rgba(144, 205, 244, 0)' }, // blue.200 with opacity 0
+        _light: { value: 'rgba(227, 30, 38, 0)' }, // primaryRed.500, no fill
+        _dark: { value: 'rgba(227, 30, 38, 0)' }, // primaryRed.500, no fill
       },
     },
   },
   navigation: {
     bg: {
+      // The active item carries no fill in Nagara's design — it is marked by
+      // red text and a red underline. The underline itself is a shape rather
+      // than a colour, so it is not set here.
       selected: {
-        _light: { value: '{colors.blue.50}' },
+        _light: { value: 'transparent' },
         _dark: { value: '{colors.gray.800}' },
       },
     },
     text: {
       selected: {
-        _light: { value: '{colors.blue.700}' },
+        _light: { value: '{colors.primaryRed.500}' },
         _dark: { value: '{colors.gray.50}' },
       },
     },
   },
   stats: {
+    // Cards sit white on the tinted page; that separation is how Nagara's
+    // surfaces read. Deliberately a literal and not `{colors.white}`: the
+    // colour theme switcher rewrites --chakra-colors-white from bg.primary, so
+    // a token reference would collapse cards into the page background the
+    // moment anyone sets NEXT_PUBLIC_COLOR_THEME_OVERRIDES.
     bg: {
-      _light: { value: '{colors.gray.50}' },
+      _light: { value: '#FFFFFF' },
       _dark: { value: '{colors.whiteAlpha.100}' },
     },
   },
   topbar: {
+    // White strip above the tinted page. Literal for the same reason as
+    // stats.bg above.
     bg: {
-      _light: { value: '{colors.gray.50}' },
+      _light: { value: '#FFFFFF' },
       _dark: { value: '{colors.whiteAlpha.100}' },
     },
   },
   tabs: {
     text: {
       primary: {
-        _light: { value: '{colors.blue.700}' },
-        _dark: { value: '{colors.blue.100}' },
+        _light: { value: '{colors.primaryRed.500}' },
+        _dark: { value: '{colors.primaryRed.200}' },
       },
     },
   },
@@ -162,6 +197,13 @@ const colors = {
     '800': { value: '#822727' },
     '900': { value: '#63171B' },
   },
+  // Nagara's brand red. Separate from `red` on purpose: `red` keeps its
+  // error/danger meaning. See ./brandColors
+  primaryRed,
+  // Nagara's tertiary accents, see ./brandColors
+  tertiary,
+  // Nagara's warm surfaces (hero band, notice bar), see ./brandColors
+  surface,
   orange: {
     '50': { value: '#FFFAF0' },
     '100': { value: '#FEEBCB' },
@@ -186,18 +228,8 @@ const colors = {
     '800': { value: '#744210' },
     '900': { value: '#5F370E' },
   },
-  gray: {
-    '50': { value: '#F7FAFC' },
-    '100': { value: '#EDF2F7' },
-    '200': { value: '#E2E8F0' },
-    '300': { value: '#CBD5E0' },
-    '400': { value: '#A0AEC0' },
-    '500': { value: '#718096' },
-    '600': { value: '#4A5568' },
-    '700': { value: '#2D3748' },
-    '800': { value: '#1A202C' },
-    '900': { value: '#171923' },
-  },
+  // Nagara's warm-neutral scale, see ./brandColors
+  gray,
   teal: {
     '50': { value: '#E6FFFA' },
     '100': { value: '#B2F5EA' },

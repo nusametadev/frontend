@@ -16,6 +16,9 @@ import { ClearButton } from 'src/toolkit/components/buttons/ClearButton';
 const nameServicesFeature = config.features.nameServices;
 
 const DEFAULT_BORDER_COLOR = { _light: 'blackAlpha.100', _dark: 'whiteAlpha.200' } as const;
+// The homepage search sits on Nagara's warm hero band, where an alpha wash
+// washes out. It needs a real line — neutral-300 in the design.
+const HERO_BORDER_COLOR = { _light: 'gray.300', _dark: 'whiteAlpha.200' } as const;
 
 interface Props extends Omit<HTMLChakraProps<'form'>, 'onChange'> {
   onChange?: (value: string) => void;
@@ -40,7 +43,8 @@ const SearchBarInput = (
   const isMobile = useIsMobile();
 
   const inputConfig = isHeroBanner ? config.slices.home.heroBanner?.search : undefined;
-  const defaultBorderWidth = isHeroBanner ? '0px' : '2px';
+  const defaultBorderWidth = isHeroBanner ? '1px' : '2px';
+  const defaultBorderColor = isHeroBanner ? HERO_BORDER_COLOR : DEFAULT_BORDER_COLOR;
 
   const handleChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
     onChange?.(event.target.value);
@@ -142,8 +146,8 @@ const SearchBarInput = (
           }}
           borderStyle="solid"
           borderColor={{
-            _light: inputConfig?.border_color?._filled?.[0] ?? DEFAULT_BORDER_COLOR._light,
-            _dark: inputConfig?.border_color?._filled?.[1] ?? inputConfig?.border_color?._filled?.[0] ?? DEFAULT_BORDER_COLOR._dark,
+            _light: inputConfig?.border_color?._filled?.[0] ?? defaultBorderColor._light,
+            _dark: inputConfig?.border_color?._filled?.[1] ?? inputConfig?.border_color?._filled?.[0] ?? defaultBorderColor._dark,
           }}
           color={{ _light: 'black', _dark: 'white' }}
           backgroundColor={
@@ -156,8 +160,8 @@ const SearchBarInput = (
           }
           _placeholderShown={{
             borderColor: {
-              _light: inputConfig?.border_color?._empty?.[0] ?? DEFAULT_BORDER_COLOR._light,
-              _dark: inputConfig?.border_color?._empty?.[1] ?? inputConfig?.border_color?._empty?.[0] ?? DEFAULT_BORDER_COLOR._dark,
+              _light: inputConfig?.border_color?._empty?.[0] ?? defaultBorderColor._light,
+              _dark: inputConfig?.border_color?._empty?.[1] ?? inputConfig?.border_color?._empty?.[0] ?? defaultBorderColor._dark,
             },
           }}
           _hover={{

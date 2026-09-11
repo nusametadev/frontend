@@ -53,7 +53,9 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
       primary: { value: { _light: '{colors.theme.bg.primary._light}', _dark: '{colors.theme.bg.primary._dark}' } },
     },
     border: {
-      divider: { value: { _light: '{colors.blackAlpha.100}', _dark: '{colors.whiteAlpha.100}' } },
+      // Nagara draws card and list borders as a visible light-grey line rather
+      // than the near-invisible alpha wash Blockscout uses.
+      divider: { value: { _light: '{colors.gray.200}', _dark: '{colors.whiteAlpha.100}' } },
       error: { value: '{colors.red.500}' },
     },
     icon: {
@@ -111,7 +113,8 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
           highlighted: { value: { _light: '{colors.orange.100}', _dark: '{colors.orange.900}' } },
         },
         border: {
-          DEFAULT: { value: { _light: '{colors.gray.100}', _dark: '{colors.gray.600}' } },
+          // Nagara's header CTA is a dark outline button, not a hairline one.
+          DEFAULT: { value: { _light: '{colors.gray.900}', _dark: '{colors.gray.600}' } },
         },
       },
       segmented: {
