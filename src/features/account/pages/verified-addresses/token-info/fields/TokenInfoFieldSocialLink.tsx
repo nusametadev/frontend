@@ -38,7 +38,7 @@ interface Props {
 const TokenInfoFieldSocialLink = ({ readOnly, size, name }: Props) => {
 
   const endElement = React.useCallback(({ field }: { field: ControllerRenderProps<Fields> }) => {
-    return <SpriteIcon name={ SETTINGS[name].icon } boxSize="60px" px={ 4 } color={ field.value ? SETTINGS[name].color : '#718096' }/>;
+    return <SpriteIcon name={ SETTINGS[name].icon } boxSize="60px" px={ 4 } color={ field.value ? SETTINGS[name].color : 'gray.500' }/>;
   }, [ name ]);
 
   return (

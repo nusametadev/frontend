@@ -90,7 +90,7 @@ const HighlightsItem = ({ data, isLoading, totalNum }: Props) => {
           <Text
             textStyle="sm"
             color={{
-              _light: data.description_color?.[0] || '#718096',
+              _light: data.description_color?.[0] || 'gray.500',
               _dark: data.description_color?.[1] || data.description_color?.[0] || '#AEB1B6',
             }}
           >
