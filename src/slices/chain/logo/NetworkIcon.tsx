@@ -5,21 +5,22 @@ import { route } from 'nextjs-routes';
 import React from 'react';
 
 import config from 'src/config';
-import SpriteIcon from 'src/sprite/SpriteIcon';
+import NagaraLogo from 'src/shared/brand/NagaraLogo';
 
 import { useColorModeValue } from 'src/toolkit/chakra/color-mode';
 import { Image } from 'src/toolkit/chakra/image';
 
 import { INVERT_FILTER } from './consts';
 
+// Nagara's mark in place of Blockscout's placeholder, for the collapsed sidebar.
+// As with NetworkLogo, NEXT_PUBLIC_NETWORK_ICON is deliberately unset, so this
+// fallback is what the app actually renders.
 const IconFallback = () => {
   return (
-    <SpriteIcon
-      name="networks/icon-placeholder"
-      w="30px"
-      h="30px"
-      color={{ base: 'blue.600', _dark: 'white' }}
-      aria-label="Network icon placeholder"
+    <NagaraLogo
+      fontSize="30px"
+      color="primaryRed.500"
+      aria-label={ `${ config.chain.name } network icon` }
     />
   );
 };
