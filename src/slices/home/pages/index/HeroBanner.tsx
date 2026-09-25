@@ -15,25 +15,44 @@ import RewardsButton from 'src/features/rewards/components/RewardsButton';
 import config from 'src/config';
 import useIsMobile from 'src/shared/hooks/useIsMobile';
 
-// Nagara's hero is a warm band with dark text, not Blockscout's purple-to-cyan
-// gradient with white text. The brand artwork is a separate layer below rather
-// than part of this value, which keeps it out of the way of the content.
-export const BACKGROUND_DEFAULT = 'surface.heroBand';
+// Nagara's hero is its section artwork, not Blockscout's purple-to-cyan
+// gradient: a grained cream band in light mode and a grained near-black one in
+// the dark themes, each with the brand splash on the right. The text turns
+// white in the dark themes, so the band has to turn dark with it.
+//
+// The colours are what shows before the image loads. Each matches its image's
+// own base (#F7F3EE / ~#0E0F11) closely enough that the swap does not flash.
+export const BACKGROUND_DEFAULT = { _light: 'surface.heroBand', _dark: 'gray.900' };
 const TEXT_COLOR_DEFAULT = 'text.primary';
 const BORDER_DEFAULT = 'none';
 
-// The artwork is 491x345 and scaled to the band height, so at the lg band
-// height (240px) it is ~342px wide. Content is kept clear of that strip so the
-// heading and the search field never sit on top of the splash.
+// Two versions of the artwork, each drawn with `cover`:
 //
-// Its own background is a measured #F6F1EC against the band's #F8F4F0 — a
-// 2-4/255 difference, invisible in place, and the same mismatch the Nagara site
-// itself has, so the two layers read as one surface.
-const ARTWORK_WIDTH = '342px';
-// Below lg the band is short, which would scale the artwork down to roughly
-// half the width of a phone screen and leave no room for the search field.
-// It is a decoration, so it simply does not appear there.
-const ARTWORK_RESERVE = { base: 4, lg: ARTWORK_WIDTH };
+// - Wide (sm and up): ~2.46:1 with the splash in the right ~28%. Content
+//   reserves the right 30% so the heading and search field never sit on it.
+//   The band is wider than the image, so `cover` crops it vertically; 30%
+//   keeps the splash (centred ~38% down the image) inside the crop.
+// - Phone (below sm): 390x844 portrait with the splash top-right. The band is
+//   made taller there with the content pushed to the bottom, so the splash
+//   shows above the heading. 10% lifts it ~40px, which is what keeps its
+//   lower arm clear of the heading on a 340-370px band.
+//
+// Below lg is still the mobile layout, but the portrait image is not stretched
+// across it: at tablet widths it would be upscaled ~2.5x, so sm and up gets the
+// wide one.
+const ARTWORK_LAYERS = [
+  {
+    display: { base: 'block', sm: 'none' },
+    image: { _light: 'url(\'/bgsection1-mobile.png\')', _dark: 'url(\'/bgsection1-mobile-dark.png\')' },
+    position: 'center 10%',
+  },
+  {
+    display: { base: 'none', sm: 'block' },
+    image: { _light: 'url(\'/bgsection1.png\')', _dark: 'url(\'/bgsection1-dark.png\')' },
+    position: 'right 30%',
+  },
+];
+const ARTWORK_RESERVE = { base: 4, sm: '30%' };
 
 const HeroBanner = () => {
 
@@ -42,12 +61,14 @@ const HeroBanner = () => {
   const background = {
     _light:
       config.slices.home.heroBanner?.background?.[0] ||
-      BACKGROUND_DEFAULT,
+      BACKGROUND_DEFAULT._light,
     _dark:
       config.slices.home.heroBanner?.background?.[1] ||
       config.slices.home.heroBanner?.background?.[0] ||
-      BACKGROUND_DEFAULT,
+      BACKGROUND_DEFAULT._dark,
   };
+  // A background set through config replaces the artwork as well as the colour.
+  const hasCustomBackground = Boolean(config.slices.home.heroBanner?.background?.length);
 
   const textColor = {
     _light:
@@ -102,9 +123,9 @@ const HeroBanner = () => {
     <Flex
       w="100%"
       // `minH` rather than a fixed height so the band still grows if its
-      // contents need more room. It also drives the size of the brand artwork,
-      // which is scaled to the band's height.
-      minH={{ base: 'auto', lg: '240px' }}
+      // contents need more room.
+      // The tall phone band only exists to make room for the splash.
+      minH={{ base: hasCustomBackground ? 'auto' : '360px', sm: '240px' }}
       background={ background }
       border={ border }
       borderRadius="md"
@@ -114,26 +135,33 @@ const HeroBanner = () => {
       pl={{ base: 4, lg: 8 }}
       pr={ ARTWORK_RESERVE }
       columnGap={ 8 }
-      alignItems="center"
+      // On phones the content sits at the bottom, under the splash.
+      alignItems={{ base: 'flex-end', sm: 'center' }}
       position="relative"
       overflow="hidden"
+      // Own stacking context, so the artwork's negative z-index keeps it above
+      // this band's background colour rather than slipping behind it.
+      isolation="isolate"
     >
-      <Box
-        // Decorative only, so it is hidden from assistive tech and cannot
-        // swallow clicks meant for the search field behind it.
-        aria-hidden
-        pointerEvents="none"
-        display={{ base: 'none', lg: 'block' }}
-        position="absolute"
-        top={ 0 }
-        right={ 0 }
-        bottom={ 0 }
-        w={ ARTWORK_WIDTH }
-        backgroundImage="url('/art-home.png')"
-        backgroundPosition="right center"
-        backgroundSize="auto 100%"
-        backgroundRepeat="no-repeat"
-      />
+      { !hasCustomBackground && ARTWORK_LAYERS.map((layer) => (
+        <Box
+          key={ layer.position }
+          // Decorative only, so it is hidden from assistive tech and cannot
+          // swallow clicks meant for the search field behind it.
+          aria-hidden
+          pointerEvents="none"
+          display={ layer.display }
+          position="absolute"
+          inset={ 0 }
+          // An absolute layer paints over in-flow siblings by default, and
+          // this one spans the whole band, so it is pushed below the content.
+          zIndex={ -1 }
+          backgroundImage={ layer.image }
+          backgroundPosition={ layer.position }
+          backgroundSize="cover"
+          backgroundRepeat="no-repeat"
+        />
+      )) }
       <Box flexGrow={ 1 }>
         <Flex mb={{ base: 2, lg: 3 }} justifyContent="space-between" alignItems="center" columnGap={ 2 }>
           <Heading
