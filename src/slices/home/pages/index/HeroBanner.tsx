@@ -20,23 +20,39 @@ import useIsMobile from 'src/shared/hooks/useIsMobile';
 // the dark themes, each with the brand splash on the right. The text turns
 // white in the dark themes, so the band has to turn dark with it.
 //
-// The colours are what shows before the image loads, and below lg where the
-// image is not drawn. Each matches its image's own base (#F7F3EE / ~#0E0F11)
-// closely enough that the swap does not flash.
+// The colours are what shows before the image loads. Each matches its image's
+// own base (#F7F3EE / ~#0E0F11) closely enough that the swap does not flash.
 export const BACKGROUND_DEFAULT = { _light: 'surface.heroBand', _dark: 'gray.900' };
-const BACKGROUND_IMAGE = { _light: 'url(\'/bgsection1.png\')', _dark: 'url(\'/bgsection1-dark.png\')' };
 const TEXT_COLOR_DEFAULT = 'text.primary';
 const BORDER_DEFAULT = 'none';
 
-// The images are ~2.46:1 and drawn with `cover`, so on a wide band they span
-// its full width and the splash lands in the right ~28%. Content is kept clear
-// of that strip so the heading and the search field never sit on the splash.
-// The band is wider than the image's aspect, so `cover` crops it vertically;
-// 30% keeps the splash (centred ~38% down the image) inside the crop.
+// Two versions of the artwork, each drawn with `cover`:
 //
-// Below lg the band is short and the search field fills it, so the splash
-// would sit underneath it. It is a decoration, so it simply does not appear.
-const ARTWORK_RESERVE = { base: 4, lg: '30%' };
+// - Wide (sm and up): ~2.46:1 with the splash in the right ~28%. Content
+//   reserves the right 30% so the heading and search field never sit on it.
+//   The band is wider than the image, so `cover` crops it vertically; 30%
+//   keeps the splash (centred ~38% down the image) inside the crop.
+// - Phone (below sm): 390x844 portrait with the splash top-right. The band is
+//   made taller there with the content pushed to the bottom, so the splash
+//   shows above the heading. 10% lifts it ~40px, which is what keeps its
+//   lower arm clear of the heading on a 340-370px band.
+//
+// Below lg is still the mobile layout, but the portrait image is not stretched
+// across it: at tablet widths it would be upscaled ~2.5x, so sm and up gets the
+// wide one.
+const ARTWORK_LAYERS = [
+  {
+    display: { base: 'block', sm: 'none' },
+    image: { _light: 'url(\'/bgsection1-mobile.png\')', _dark: 'url(\'/bgsection1-mobile-dark.png\')' },
+    position: 'center 10%',
+  },
+  {
+    display: { base: 'none', sm: 'block' },
+    image: { _light: 'url(\'/bgsection1.png\')', _dark: 'url(\'/bgsection1-dark.png\')' },
+    position: 'right 30%',
+  },
+];
+const ARTWORK_RESERVE = { base: 4, sm: '30%' };
 
 const HeroBanner = () => {
 
@@ -108,7 +124,8 @@ const HeroBanner = () => {
       w="100%"
       // `minH` rather than a fixed height so the band still grows if its
       // contents need more room.
-      minH={{ base: 'auto', lg: '240px' }}
+      // The tall phone band only exists to make room for the splash.
+      minH={{ base: hasCustomBackground ? 'auto' : '360px', sm: '240px' }}
       background={ background }
       border={ border }
       borderRadius="md"
@@ -118,31 +135,33 @@ const HeroBanner = () => {
       pl={{ base: 4, lg: 8 }}
       pr={ ARTWORK_RESERVE }
       columnGap={ 8 }
-      alignItems="center"
+      // On phones the content sits at the bottom, under the splash.
+      alignItems={{ base: 'flex-end', sm: 'center' }}
       position="relative"
       overflow="hidden"
       // Own stacking context, so the artwork's negative z-index keeps it above
       // this band's background colour rather than slipping behind it.
       isolation="isolate"
     >
-      { !hasCustomBackground && (
+      { !hasCustomBackground && ARTWORK_LAYERS.map((layer) => (
         <Box
+          key={ layer.position }
           // Decorative only, so it is hidden from assistive tech and cannot
           // swallow clicks meant for the search field behind it.
           aria-hidden
           pointerEvents="none"
-          display={{ base: 'none', lg: 'block' }}
+          display={ layer.display }
           position="absolute"
           inset={ 0 }
           // An absolute layer paints over in-flow siblings by default, and
           // this one spans the whole band, so it is pushed below the content.
           zIndex={ -1 }
-          backgroundImage={ BACKGROUND_IMAGE }
-          backgroundPosition="right 30%"
+          backgroundImage={ layer.image }
+          backgroundPosition={ layer.position }
           backgroundSize="cover"
           backgroundRepeat="no-repeat"
         />
-      ) }
+      )) }
       <Box flexGrow={ 1 }>
         <Flex mb={{ base: 2, lg: 3 }} justifyContent="space-between" alignItems="center" columnGap={ 2 }>
           <Heading
