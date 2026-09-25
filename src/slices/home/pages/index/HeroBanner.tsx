@@ -15,25 +15,28 @@ import RewardsButton from 'src/features/rewards/components/RewardsButton';
 import config from 'src/config';
 import useIsMobile from 'src/shared/hooks/useIsMobile';
 
-// Nagara's hero is a warm band with dark text, not Blockscout's purple-to-cyan
-// gradient with white text. The brand artwork is a separate layer below rather
-// than part of this value, which keeps it out of the way of the content.
-export const BACKGROUND_DEFAULT = 'surface.heroBand';
+// Nagara's hero is its section artwork, not Blockscout's purple-to-cyan
+// gradient: a grained cream band in light mode and a grained near-black one in
+// the dark themes, each with the brand splash on the right. The text turns
+// white in the dark themes, so the band has to turn dark with it.
+//
+// The colours are what shows before the image loads, and below lg where the
+// image is not drawn. Each matches its image's own base (#F7F3EE / ~#0E0F11)
+// closely enough that the swap does not flash.
+export const BACKGROUND_DEFAULT = { _light: 'surface.heroBand', _dark: 'gray.900' };
+const BACKGROUND_IMAGE = { _light: 'url(\'/bgsection1.png\')', _dark: 'url(\'/bgsection1-dark.png\')' };
 const TEXT_COLOR_DEFAULT = 'text.primary';
 const BORDER_DEFAULT = 'none';
 
-// The artwork is 491x345 and scaled to the band height, so at the lg band
-// height (240px) it is ~342px wide. Content is kept clear of that strip so the
-// heading and the search field never sit on top of the splash.
+// The images are ~2.46:1 and drawn with `cover`, so on a wide band they span
+// its full width and the splash lands in the right ~28%. Content is kept clear
+// of that strip so the heading and the search field never sit on the splash.
+// The band is wider than the image's aspect, so `cover` crops it vertically;
+// 30% keeps the splash (centred ~38% down the image) inside the crop.
 //
-// Its own background is a measured #F6F1EC against the band's #F8F4F0 — a
-// 2-4/255 difference, invisible in place, and the same mismatch the Nagara site
-// itself has, so the two layers read as one surface.
-const ARTWORK_WIDTH = '342px';
-// Below lg the band is short, which would scale the artwork down to roughly
-// half the width of a phone screen and leave no room for the search field.
-// It is a decoration, so it simply does not appear there.
-const ARTWORK_RESERVE = { base: 4, lg: ARTWORK_WIDTH };
+// Below lg the band is short and the search field fills it, so the splash
+// would sit underneath it. It is a decoration, so it simply does not appear.
+const ARTWORK_RESERVE = { base: 4, lg: '30%' };
 
 const HeroBanner = () => {
 
@@ -42,12 +45,14 @@ const HeroBanner = () => {
   const background = {
     _light:
       config.slices.home.heroBanner?.background?.[0] ||
-      BACKGROUND_DEFAULT,
+      BACKGROUND_DEFAULT._light,
     _dark:
       config.slices.home.heroBanner?.background?.[1] ||
       config.slices.home.heroBanner?.background?.[0] ||
-      BACKGROUND_DEFAULT,
+      BACKGROUND_DEFAULT._dark,
   };
+  // A background set through config replaces the artwork as well as the colour.
+  const hasCustomBackground = Boolean(config.slices.home.heroBanner?.background?.length);
 
   const textColor = {
     _light:
@@ -102,8 +107,7 @@ const HeroBanner = () => {
     <Flex
       w="100%"
       // `minH` rather than a fixed height so the band still grows if its
-      // contents need more room. It also drives the size of the brand artwork,
-      // which is scaled to the band's height.
+      // contents need more room.
       minH={{ base: 'auto', lg: '240px' }}
       background={ background }
       border={ border }
@@ -117,23 +121,28 @@ const HeroBanner = () => {
       alignItems="center"
       position="relative"
       overflow="hidden"
+      // Own stacking context, so the artwork's negative z-index keeps it above
+      // this band's background colour rather than slipping behind it.
+      isolation="isolate"
     >
-      <Box
-        // Decorative only, so it is hidden from assistive tech and cannot
-        // swallow clicks meant for the search field behind it.
-        aria-hidden
-        pointerEvents="none"
-        display={{ base: 'none', lg: 'block' }}
-        position="absolute"
-        top={ 0 }
-        right={ 0 }
-        bottom={ 0 }
-        w={ ARTWORK_WIDTH }
-        backgroundImage="url('/art-home.png')"
-        backgroundPosition="right center"
-        backgroundSize="auto 100%"
-        backgroundRepeat="no-repeat"
-      />
+      { !hasCustomBackground && (
+        <Box
+          // Decorative only, so it is hidden from assistive tech and cannot
+          // swallow clicks meant for the search field behind it.
+          aria-hidden
+          pointerEvents="none"
+          display={{ base: 'none', lg: 'block' }}
+          position="absolute"
+          inset={ 0 }
+          // An absolute layer paints over in-flow siblings by default, and
+          // this one spans the whole band, so it is pushed below the content.
+          zIndex={ -1 }
+          backgroundImage={ BACKGROUND_IMAGE }
+          backgroundPosition="right 30%"
+          backgroundSize="cover"
+          backgroundRepeat="no-repeat"
+        />
+      ) }
       <Box flexGrow={ 1 }>
         <Flex mb={{ base: 2, lg: 3 }} justifyContent="space-between" alignItems="center" columnGap={ 2 }>
           <Heading
