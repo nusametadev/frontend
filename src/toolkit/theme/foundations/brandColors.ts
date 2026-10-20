@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: LicenseRef-Blockscout
 
 /**
- * Nagara brand palette.
+ * Nagara brand palette — design system v5.
  *
  * Source of truth for every colour that comes from the Nagara design system
- * rather than from Blockscout. Values are extracted in `docs/nagara-theme-export.md`,
- * which traces each one back to a literal hex in the Nagara web app.
+ * rather than from Blockscout. Values are taken verbatim from
+ * `docs/DESIGN-nagara-v5.md`, which is the design team's own spec rather than
+ * a reconstruction from screenshots (see `docs/nagara-theme-export.md` for how
+ * the superseded v4/red scheme was extracted).
  *
  * Kept in its own file so that upstream changes to `colors.ts` (which tracks
  * blockscout/frontend) conflict on two lines instead of on the whole palette.
@@ -25,10 +27,9 @@
  * as a near-white raised surface (stats bar, top bar, icon backgrounds) rather
  * than as a line or a text colour.
  *
- * Two steps are load-bearing in light mode and worth knowing before touching
- * them: `300` is the OFF state of every switch, and `600` backs Chakra's
- * inherited `fg.muted`, hence every form field's helper text (#3D3F44 gives
- * 10.5:1 on white).
+ * Unrelated to the v5 rebrand below — the design spec has no opinion on a
+ * neutral scale, and this one does not clash with any of its warm surfaces, so
+ * it is carried over unchanged from the v4 (red) theme.
  */
 export const gray = {
   '50': { value: '#FBFBFC' }, // interpolated: neutral-100 <-> white
@@ -44,63 +45,107 @@ export const gray = {
 };
 
 /**
- * Nagara's brand red. `500` is THE brand colour — links, active navigation,
- * primary buttons, chart lines.
- *
- * Deliberately separate from `red`, which stays on Blockscout's values and
- * keeps its error/danger meaning. Two red scales is the point: without the
- * split, an error message and a link would be the same colour.
- *
- * The design system defines 100–500 only, and note that its `100` is plain
- * WHITE rather than a pale red — the ramp starts at the page, not at a tint.
- * There is deliberately no `50`: nothing is lighter than white.
- *
- * 600–900 are extensions, not canon. Steps 200–500 sit on one disciplined HSL
- * ramp (hue fixed at ~358 deg, saturation fixed at ~78%, only lightness
- * moving), verified by reconstructing 200 from H358/S78%/L90% — that lands on
- * #F9D2D3 against the real #F9D2D4, one step off on blue — so the dark end
- * continues that same ramp instead of being guessed. Canonical values below are
- * the originals, never the reconstructions, so `500` stays exactly #E31E26.
+ * Nagara's navy. Single canonical step — the spec never shades it, it is used
+ * flat for headline text, banner surfaces and the dark-mode highlighted card
+ * (`surface-dark-2` in the spec is explicitly "reused from Navy").
  */
-export const primaryRed = {
-  '100': { value: '#FFFFFF' }, // Nagara primaryRed-100 — white, by design
-  '200': { value: '#F9D2D4' }, // Nagara primaryRed-200
-  '300': { value: '#F28F93' }, // Nagara primaryRed-300
-  '400': { value: '#EC6267' }, // Nagara primaryRed-400
-  '500': { value: '#E31E26' }, // Nagara primaryRed-500 — brand colour
-  '600': { value: '#BF181D' }, // extension, L 42%
-  '700': { value: '#9A1318' }, // extension, L 34%
-  '800': { value: '#760F12' }, // extension, L 26%
-  '900': { value: '#520A0C' }, // extension, L 18%
+export const navy = {
+  '500': { value: '#071b4d' }, // Nagara navy-500
 };
 
 /**
- * Nagara's tertiary accents. Flat named colours, not scales — the design system
- * gives exactly one value each, so there are no steps to reference.
- *
- * `orange` is the one with a real job in Nagara's own UI: the announcement
- * banner's label and border. `pink` and `burgundy` are defined by the palette
- * but unused there, carried here so the design system is complete.
+ * Nagara's gold. Secondary brand colour: the hover-state surface for CTAs,
+ * the icon-button / profile-chip colour, and the brand word picked out in the
+ * hero banner. Two canonical steps only — one per colour mode, not a light/dark
+ * ramp of the same step. `500` is the light-mode value, `400` is the dedicated
+ * dark-mode value (a touch lighter, for contrast against navy), matching the
+ * spec's own naming.
  */
-export const tertiary = {
-  orange: { value: '#E63E00' },
-  pink: { value: '#F8BBCA' },
-  burgundy: { value: '#9B2710' },
+export const gold = {
+  '400': { value: '#d1a241' }, // Nagara gold-400 — dark mode
+  '500': { value: '#c58b12' }, // Nagara gold-500 — light mode
 };
 
 /**
- * Nagara's warm surfaces. These sit outside the neutral scale — they are warm
- * (a touch of yellow/red) where `gray` is cool, so they cannot be expressed as
- * a step of it.
+ * Nagara's green family. THE primary brand colour: primary CTAs, text links,
+ * active navigation and chart lines. As with gold, `500` and `400` are not a
+ * light/dark step of one ramp — they are two distinct canonical tokens the
+ * spec calls "Green" and "Light Green", picked for light mode and dark mode
+ * respectively. `100` is the one additional canonical tint, used for the
+ * connected-wallet surface. No other steps are invented: everything here is a
+ * literal value from the spec, nothing interpolated.
  *
- * Not from the brand book's colour sheet: both are traced to literals in
- * Nagara's own components in `docs/nagara-theme-export.md`, and corroborated by
- * the Explorer design. Named rather than inlined so the design-system rule
- * against raw hex still holds at the point of use.
+ * Named `primaryGreen` rather than `green` because `green` already exists
+ * below as Chakra's generic success/badge scale — the two must stay distinct
+ * the same way the superseded v4 (red) theme's brand colour never collided
+ * with Chakra's generic `red`.
+ */
+export const primaryGreen = {
+  '100': { value: '#d1e6da' }, // Nagara light-green-100 — connected NGRX wallet surface
+  '400': { value: '#45a16a' }, // Nagara light-green-400 — dark mode primary/link/chart
+  '500': { value: '#178a45' }, // Nagara green-500 — light mode primary/link/chart
+};
+
+/**
+ * Nagara's purple family, reserved by the spec specifically for Web3/token
+ * content (tokens, marketplace, supply) — never used outside that context.
+ * Named `web3Purple`, not `purple`, for the same reason as `primaryGreen`:
+ * Chakra's generic `purple` scale already exists below for ordinary badges.
+ *
+ * Only the five steps the spec defines are present (100, 200, 300, 500, 600).
+ * There is no 400 in the source — left out rather than guessed.
+ */
+export const web3Purple = {
+  '100': { value: '#dbd3f1' }, // NGRX filling-form surface — light mode
+  '200': { value: '#b7a7e3' }, // hairline for Web3 element/data highlight
+  '300': { value: '#937ad4' }, // Web3 element & data highlight — dark mode
+  '500': { value: '#4b22b8' }, // Web3 elements — light mode (tokens, marketplace, supply)
+  '600': { value: '#3c1b93' }, // Web3 element data highlight, NGRX filling-form surface — dark mode
+};
+
+/**
+ * Flat graphic-element accents — one value each, no steps, same shape as the
+ * old (now removed) `tertiary` export. The v4 tertiary accents (`orange`,
+ * `pink`, `burgundy`) were paired with the red brand and have no v5
+ * equivalent in the spec, so they are dropped rather than carried forward;
+ * nothing in this codebase referenced them.
+ */
+export const graphicAccent = {
+  cyanBlue: { value: '#0f84d8' },
+  babyBlue: { value: '#eef5ff' },
+};
+
+/**
+ * Nagara's warm surfaces — page backgrounds and section/card fills, light and
+ * dark. These sit outside the neutral scale (`gray` above): they carry a warm
+ * cast in light mode, and in dark mode they are navy-tinted rather than
+ * neutral, so neither direction can be expressed as a step of `gray`.
+ *
+ * `surface-dark-2` from the spec is deliberately absent here: the spec defines
+ * it as "reused from Navy", i.e. it is `navy.500` above, not a separate value.
  */
 export const surface = {
-  // The homepage hero band sitting behind the title and search field.
-  heroBand: { value: '#F8F4F0' },
-  // Announcement / alert bar, paired with `tertiary.orange` for its text.
-  notice: { value: '#FBEEE4' },
+  light1: { value: '#f8f4ee' }, // default page surface, form fill, secondary button — light
+  light2: { value: '#e8d1a0' }, // banner / page-section surface — light
+  light3: { value: '#f1e9dd' }, // highlighted card/section surface — light
+  mutedLight: { value: '#dcc9a9' }, // unavailable-CTA surface — light
+  dark1: { value: '#04102e' }, // default page surface, secondary button — dark
+  dark3: { value: '#06163e' }, // banner/section surface, form fill inside card — dark
+  dark4: { value: '#9ca4b8' }, // banner surface — dark
+  mutedDark: { value: '#6a7694' }, // unavailable-CTA surface — dark
+};
+
+/**
+ * Non-interactive text and hairline tokens. Per the spec's own guardrail,
+ * these are for muted/disabled states and card outlines only — never for
+ * active text or buttons.
+ */
+export const mutedText = {
+  light: { value: '#aea494' },
+  dark: { value: '#45494c' },
+};
+
+export const hairline = {
+  light: { value: '#b0a187' },
+  dark: { value: '#747779' },
 };
