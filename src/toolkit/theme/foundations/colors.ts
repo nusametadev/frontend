@@ -4,30 +4,29 @@ import { defaultsDeep } from 'es-toolkit/compat';
 
 import config from 'src/config';
 
-import { gray, primaryRed, surface, tertiary } from './brandColors';
+import { gold, gray, graphicAccent, hairline, mutedText, navy, primaryGreen, surface, web3Purple } from './brandColors';
 
 /**
- * Nagara's theme layer.
+ * Nagara's theme layer — design system v5.
  *
- * Values are taken from the Nagara Explorer design (Figma) and expressed with
- * the brand scales in ./brandColors, so there are almost no literals here.
+ * Values are taken from `docs/DESIGN-nagara-v5.md` and expressed with the
+ * brand scales in ./brandColors, so there are almost no literals here.
  *
  * Keep this object structurally identical to upstream — same keys, same
  * nesting, only the values differ. A new theme role added upstream then shows
  * up as an ordinary merge conflict instead of being silently dropped.
  *
- * `_dark` is changed only where the value carried Blockscout's blue brand.
- * Nagara is a light-only design with no opinion on dark surfaces, but a blue
- * brand would be plainly wrong if a reader switches to a dark theme.
+ * Unlike the v4 (red) theme, v5 has an explicit opinion on dark surfaces —
+ * `surface.dark1` / `.dark3` / `.dark4` below come straight from the spec,
+ * not from guessing a dark complement of the light values.
  */
 const DEFAULT_THEME_COLORS = {
   bg: {
     primary: {
-      // for some reason links to colors.white and colors.black variables are not working here
-      // so we use hex values instead
-      // but it is not the case for other colors
-      _light: { value: '#F7F7F8' }, // Nagara page tint, = gray.100
-      _dark: { value: '#101112' }, // colors.black
+      // Nagara's default page surface in each mode. Spec: "surface-light-1" /
+      // "surface-dark-1".
+      _light: { value: '{colors.surface.light1}' },
+      _dark: { value: '{colors.surface.dark1}' },
     },
   },
   text: {
@@ -43,27 +42,29 @@ const DEFAULT_THEME_COLORS = {
     },
   },
   hover: {
-    // Nagara turns interactive elements brand-red on hover. A step darker than
-    // the brand, so links — already red — still change visibly.
-    _light: { value: '{colors.primaryRed.600}' },
-    _dark: { value: '{colors.primaryRed.400}' },
+    // Nagara's hover state for interactive elements is gold, not a shade of
+    // the primary green — see "button-hover" in the spec's button table.
+    _light: { value: '{colors.gold.500}' },
+    _dark: { value: '{colors.gold.400}' },
   },
   selected: {
     control: {
       text: {
-        _light: { value: '{colors.primaryRed.500}' },
+        _light: { value: '{colors.primaryGreen.500}' },
         _dark: { value: '{colors.gray.50}' },
       },
       bg: {
-        _light: { value: '{colors.primaryRed.200}' },
+        // light-green-100 is the spec's own tint for a "selected"/connected
+        // surface (it calls it out for the connected-wallet card).
+        _light: { value: '{colors.primaryGreen.100}' },
         _dark: { value: '{colors.whiteAlpha.50}' },
       },
     },
     option: {
-      // Filled selected option — Nagara's segmented control is solid brand red.
+      // Filled selected option — solid brand green, light-green in dark mode.
       bg: {
-        _light: { value: '{colors.primaryRed.500}' },
-        _dark: { value: '{colors.primaryRed.500}' },
+        _light: { value: '{colors.primaryGreen.500}' },
+        _dark: { value: '{colors.primaryGreen.400}' },
       },
     },
   },
@@ -79,8 +80,8 @@ const DEFAULT_THEME_COLORS = {
   },
   button: {
     primary: {
-      _light: { value: '{colors.primaryRed.500}' },
-      _dark: { value: '{colors.primaryRed.400}' },
+      _light: { value: '{colors.primaryGreen.500}' },
+      _dark: { value: '{colors.primaryGreen.400}' },
       text: {
         _light: { value: '{colors.white}' },
         _dark: { value: '{colors.white}' },
@@ -90,33 +91,34 @@ const DEFAULT_THEME_COLORS = {
   link: {
     // Block numbers, hashes and addresses throughout the design.
     primary: {
-      _light: { value: '{colors.primaryRed.500}' },
-      _dark: { value: '{colors.primaryRed.300}' },
+      _light: { value: '{colors.primaryGreen.500}' },
+      _dark: { value: '{colors.primaryGreen.400}' },
     },
   },
   graph: {
     line: {
-      _light: { value: '{colors.primaryRed.500}' },
-      _dark: { value: '{colors.primaryRed.300}' },
+      _light: { value: '{colors.primaryGreen.500}' },
+      _dark: { value: '{colors.primaryGreen.400}' },
     },
-    // Nagara's chart is a bare line: no area fill. Both stops are fully
-    // transparent rather than removed, because the <linearGradient> is still
-    // rendered and needs two valid colour stops.
+    // Nagara's chart is a bare line: no area fill (the spec's "no gradients
+    // anywhere" guardrail). Both stops are fully transparent rather than
+    // removed, because the <linearGradient> is still rendered and needs two
+    // valid colour stops.
     gradient: {
       start: {
-        _light: { value: 'rgba(227, 30, 38, 0)' }, // primaryRed.500, no fill
-        _dark: { value: 'rgba(227, 30, 38, 0)' }, // primaryRed.500, no fill
+        _light: { value: 'rgba(23, 138, 69, 0)' }, // primaryGreen.500, no fill
+        _dark: { value: 'rgba(69, 161, 106, 0)' }, // primaryGreen.400, no fill
       },
       stop: {
-        _light: { value: 'rgba(227, 30, 38, 0)' }, // primaryRed.500, no fill
-        _dark: { value: 'rgba(227, 30, 38, 0)' }, // primaryRed.500, no fill
+        _light: { value: 'rgba(23, 138, 69, 0)' }, // primaryGreen.500, no fill
+        _dark: { value: 'rgba(69, 161, 106, 0)' }, // primaryGreen.400, no fill
       },
     },
   },
   navigation: {
     bg: {
       // The active item carries no fill in Nagara's design — it is marked by
-      // red text and a red underline. The underline itself is a shape rather
+      // green text and an underline. The underline itself is a shape rather
       // than a colour, so it is not set here.
       selected: {
         _light: { value: 'transparent' },
@@ -125,35 +127,36 @@ const DEFAULT_THEME_COLORS = {
     },
     text: {
       selected: {
-        _light: { value: '{colors.primaryRed.500}' },
+        _light: { value: '{colors.primaryGreen.500}' },
         _dark: { value: '{colors.gray.50}' },
       },
     },
   },
   stats: {
-    // Cards sit white on the tinted page; that separation is how Nagara's
-    // surfaces read. Deliberately a literal and not `{colors.white}`: the
-    // colour theme switcher rewrites --chakra-colors-white from bg.primary, so
-    // a token reference would collapse cards into the page background the
-    // moment anyone sets NEXT_PUBLIC_COLOR_THEME_OVERRIDES.
+    // Nagara's highlighted-card surface, light and dark — the spec's own
+    // "cream highlight card" / "dark thumbnail card" elevation levels. A
+    // literal rather than `{colors.white}`: the colour theme switcher
+    // rewrites --chakra-colors-white from bg.primary, so a token reference
+    // would collapse cards into the page background the moment anyone sets
+    // NEXT_PUBLIC_COLOR_THEME_OVERRIDES.
     bg: {
-      _light: { value: '#FFFFFF' },
-      _dark: { value: '{colors.whiteAlpha.100}' },
+      _light: { value: '#f1e9dd' }, // surface-light-3
+      _dark: { value: '#06163e' }, // surface-dark-3
     },
   },
   topbar: {
-    // White strip above the tinted page. Literal for the same reason as
-    // stats.bg above.
+    // Strip above the tinted page. Literal for the same reason as stats.bg
+    // above.
     bg: {
-      _light: { value: '#FFFFFF' },
-      _dark: { value: '{colors.whiteAlpha.100}' },
+      _light: { value: '#f1e9dd' }, // surface-light-3
+      _dark: { value: '#06163e' }, // surface-dark-3
     },
   },
   tabs: {
     text: {
       primary: {
-        _light: { value: '{colors.primaryRed.500}' },
-        _dark: { value: '{colors.primaryRed.200}' },
+        _light: { value: '{colors.primaryGreen.500}' },
+        _dark: { value: '{colors.primaryGreen.400}' },
       },
     },
   },
@@ -197,13 +200,24 @@ const colors = {
     '800': { value: '#822727' },
     '900': { value: '#63171B' },
   },
-  // Nagara's brand red. Separate from `red` on purpose: `red` keeps its
-  // error/danger meaning. See ./brandColors
-  primaryRed,
-  // Nagara's tertiary accents, see ./brandColors
-  tertiary,
-  // Nagara's warm surfaces (hero band, notice bar), see ./brandColors
+  // Nagara's brand navy, gold and primary green. Named `primaryGreen` (not
+  // `green`) and the Web3-only purple is named `web3Purple` (not `purple`)
+  // because Chakra's generic scales of those names already exist below for
+  // ordinary badges/success states — same reason `red` keeps its
+  // error/danger meaning separate from the brand. See ./brandColors
+  navy,
+  gold,
+  primaryGreen,
+  // Nagara's purple, reserved for Web3/token content only, see ./brandColors
+  web3Purple,
+  // Nagara's flat graphic-element accents, see ./brandColors
+  graphicAccent,
+  // Nagara's warm page/card surfaces, see ./brandColors
   surface,
+  // Nagara's muted-text and hairline tokens — disabled/non-interactive states
+  // and card outlines only, see ./brandColors
+  mutedText,
+  hairline,
   orange: {
     '50': { value: '#FFFAF0' },
     '100': { value: '#FEEBCB' },

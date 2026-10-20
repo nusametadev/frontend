@@ -48,24 +48,42 @@ Never use raw color values (hex, RGB, HSL). Always reference a token. Three sour
 
    Common groups: `text.*`, `bg.*`, `border.*`, `icon.*`, `link.*`, `button.*`, `badge.*`.
 
-2. **Project color palette** — scale and alpha colors defined in `src/toolkit/theme/foundations/colors.ts`: `gray`, `blue`, `red`, `primaryRed`, `orange`, `yellow`, `green`, `teal`, `cyan`, `purple`, `pink` (steps 50–900), `black`, `white`, `whiteAlpha.*`, `blackAlpha.*`.
+2. **Project color palette** — scale and alpha colors defined in `src/toolkit/theme/foundations/colors.ts`: `gray`, `blue`, `red`, `orange`, `yellow`, `green`, `teal`, `cyan`, `purple`, `pink` (steps 50–900), `black`, `white`, `whiteAlpha.*`, `blackAlpha.*`.
 
    ```tsx
    <Box bg="blue.50" color="gray.700" />
    ```
 
-   Two of these carry Nagara brand values and are defined in
-   `src/toolkit/theme/foundations/brandColors.ts` rather than inline:
+   Several of these carry Nagara brand values (design system **v5** — full spec at
+   [`docs/DESIGN-nagara-v5.md`](../../docs/DESIGN-nagara-v5.md), the source of truth for
+   every hex below) and are defined in `src/toolkit/theme/foundations/brandColors.ts`
+   rather than inline:
 
-   - `primaryRed` is the **brand** red (`primaryRed.500` = `#E31E26`) — links, active
-     navigation, primary buttons, chart lines. `red` is **not** a brand colour: it keeps
-     Blockscout's values and its error/danger meaning. Never reach for `red` to express
-     the brand, or for `primaryRed` to express an error. Note two things about its shape:
-     it has **no `50`**, and `primaryRed.100` is plain **white** — that is the design
-     system's own ramp, not a mistake. Steps `600`–`900` are local extensions, not canon.
+   - `navy.500` (`#071b4d`) — headline text, banner surfaces, dark-mode highlighted card.
+   - `gold.500` / `gold.400` (light / dark mode) — the brand word in the hero, CTA hover
+     state, icon-button and profile-chip colour. These are two distinct canonical tokens,
+     not a light/dark step of one ramp.
+   - `primaryGreen.500` / `primaryGreen.400` (light / dark mode) — THE primary action
+     colour: links, active navigation, primary buttons, chart lines. `primaryGreen.100`
+     is the one additional canonical tint (connected-wallet surface). Named
+     `primaryGreen`, not `green`, because `green` above is Chakra's generic
+     success/badge scale — the two must stay distinct the same way `primaryRed` never
+     collided with `red` in the superseded v4 (red) theme. Never reach for `green` to
+     express the brand, or for `primaryGreen` for a success/badge colour.
+   - `web3Purple.{100,200,300,500,600}` — reserved **only** for Web3/token content
+     (tokens, marketplace, supply) per the spec's own guardrail. Named `web3Purple`, not
+     `purple`, for the same reason as `primaryGreen` above. No `400` exists in the spec —
+     it is not invented here either.
+   - `surface.{light1,light2,light3,mutedLight,dark1,dark3,dark4,mutedDark}` — page and
+     card surfaces per mode. `surface-dark-2` from the spec is not a separate token: the
+     spec defines it as "reused from Navy", i.e. `navy.500` above.
+   - `mutedText.{light,dark}` and `hairline.{light,dark}` — disabled/non-interactive text
+     and card outlines only, never active text or buttons (another of the spec's own
+     guardrails).
    - `gray` is Nagara's warm-neutral scale, mapped step-for-step onto
      `neutral-100..900`. Only `gray.50` is interpolated, since Nagara's scale has no
      50. The values are warm, so they will not match Chakra's blue-tinted defaults.
+     Unrelated to the v5 brand colours above — carried over unchanged from v4.
 
 3. **Brand colors** — also defined in `src/toolkit/theme/foundations/colors.ts`: `github`, `telegram`, `linkedin`, `discord`, `slack`, `twitter`, `opensea`, `facebook`, `medium`, `reddit`, `celo`, `clusters`.
 
@@ -73,12 +91,12 @@ Never use raw color values (hex, RGB, HSL). Always reference a token. Three sour
    <Icon color="github" />
    ```
 
-   Nagara's tertiary accents live alongside them as `tertiary.orange` (`#E63E00`),
-   `tertiary.pink` (`#F8BBCA`) and `tertiary.burgundy` (`#9B2710`) — flat named colours
-   with no steps, defined in `brandColors.ts`.
+   Nagara's flat graphic-element accents live alongside them as `graphicAccent.cyanBlue`
+   (`#0f84d8`) and `graphicAccent.babyBlue` (`#eef5ff`) — no steps, defined in
+   `brandColors.ts`.
 
    ```tsx
-   <Box borderColor="tertiary.orange" />
+   <Box borderColor="graphicAccent.cyanBlue" />
    ```
 
 If a raw color value is truly unavoidable (e.g. a third-party embed), leave a comment explaining why.
