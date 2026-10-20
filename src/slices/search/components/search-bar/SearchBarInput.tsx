@@ -16,9 +16,10 @@ import { ClearButton } from 'src/toolkit/components/buttons/ClearButton';
 const nameServicesFeature = config.features.nameServices;
 
 const DEFAULT_BORDER_COLOR = { _light: 'blackAlpha.100', _dark: 'whiteAlpha.200' } as const;
-// The homepage search sits on Nagara's warm hero band, where an alpha wash
-// washes out. It needs a real line — neutral-300 in the design.
-const HERO_BORDER_COLOR = { _light: 'gray.300', _dark: 'whiteAlpha.200' } as const;
+// The homepage search sits on Nagara's navy hero band, where an alpha wash
+// washes out. It needs a real line — the spec's "Idle form" border, hairline
+// tokens rather than the generic gray scale.
+const HERO_BORDER_COLOR = { _light: 'hairline.light', _dark: 'hairline.dark' } as const;
 
 interface Props extends Omit<HTMLChakraProps<'form'>, 'onChange'> {
   onChange?: (value: string) => void;
