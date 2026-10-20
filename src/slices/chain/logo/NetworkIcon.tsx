@@ -14,12 +14,14 @@ import { INVERT_FILTER } from './consts';
 
 // Nagara's mark in place of Blockscout's placeholder, for the collapsed sidebar.
 // As with NetworkLogo, NEXT_PUBLIC_NETWORK_ICON is deliberately unset, so this
-// fallback is what the app actually renders.
+// fallback is what the app actually renders. Gold rather than navy: the mark
+// needs to read against both the light and dark sidebar background, and gold
+// is the one brand colour the spec uses the same way in both modes.
 const IconFallback = () => {
   return (
     <NagaraLogo
       fontSize="30px"
-      color="primaryRed.500"
+      color={{ _light: 'gold.500', _dark: 'gold.400' }}
       aria-label={ `${ config.chain.name } network icon` }
     />
   );
@@ -45,7 +47,11 @@ const NetworkIcon = ({ className }: Props) => {
         src={ iconSrc }
         alt={ `${ config.chain.name } network icon` }
         fallback={ <IconFallback/> }
-        filter={{ _dark: !config.chain.icon.dark ? INVERT_FILTER : undefined }}
+        // Only meaningful for a *configured* icon with no explicit dark
+        // variant — see the matching comment in NetworkLogo. Without this
+        // guard the `<Image>` wrapper would clone this filter onto
+        // IconFallback too and invert its already mode-aware gold colour.
+        filter={ iconSrc ? { _dark: !config.chain.icon.dark ? INVERT_FILTER : undefined } : undefined }
         objectFit="contain"
         objectPosition="left"
       />
