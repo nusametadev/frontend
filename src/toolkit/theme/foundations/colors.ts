@@ -25,8 +25,13 @@ const DEFAULT_THEME_COLORS = {
     primary: {
       // Nagara's default page surface in each mode. Spec: "surface-light-1" /
       // "surface-dark-1".
-      _light: { value: '{colors.surface.light1}' },
-      _dark: { value: '{colors.surface.dark1}' },
+      //
+      // Literals, not `{colors.surface.*}`: the colour theme switcher copies
+      // this value verbatim into --chakra-colors-white / -black and
+      // bg.primary as inline CSS, where a token reference is not resolved and
+      // breaks every colour that reads those variables.
+      _light: { value: '#f8f4ee' }, // surface-light-1
+      _dark: { value: '#04102e' }, // surface-dark-1
     },
   },
   text: {

@@ -23,7 +23,9 @@ import useIsMobile from 'src/shared/hooks/useIsMobile';
 // the brand instead of an image behind it.
 export const BACKGROUND_DEFAULT = { _light: 'navy.500', _dark: 'navy.500' };
 // The band is navy in both modes, so the title stays white in both modes too.
-const TEXT_COLOR_DEFAULT = 'white';
+// A literal (spec ink-white): the colour theme switcher repoints the `white`
+// token at the page surface, which is cream in light mode.
+const TEXT_COLOR_DEFAULT = '#ffffff';
 const BORDER_DEFAULT = 'none';
 
 const HeroBanner = () => {
