@@ -973,6 +973,16 @@ export const TEMPLATE_MAP: Record<Route['pathname'], RouteTemplateRecord> = {
       },
     },
   },
+  '/api/nagara-price': {
+    metadata: {
+      title: {
+        'default': '%chain_name% node API Nagara price',
+      },
+      description: {
+        'default': DESCRIPTION_DEFAULT,
+      },
+    },
+  },
   '/api/config': {
     metadata: {
       title: {

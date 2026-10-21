@@ -86,6 +86,7 @@ All json-like values should be single-quoted. If it contains a hash (`#`) or a d
   - [MetaSuites extension](#metasuites-extension)
   - [Multichain button](#multichain-button)
   - [Multichain explorer](#multichain-explorer)
+  - [Nagara price](#nagara-price)
   - [Name services](#name-services)
   - [Rewards](#rewards)
   - [Rollup](#rollup)
@@ -1108,6 +1109,16 @@ This feature enables the application to act as an explorer of multiple blockchai
 | [NEXT_PUBLIC_MULTICHAIN_AGGREGATOR_API_HOST](#multichain-aggregator-api) | Required |
 | [NEXT_PUBLIC_MULTICHAIN_CLUSTER](#multichain-aggregator-api) | Required |
 | [NEXT_PUBLIC_MULTICHAIN_STATS_API_HOST](#multichain-stats-api) | Required |
+
+&nbsp;
+
+### Nagara price
+
+Shows the native coin price (IDR), market cap and total supply in a strip under the home page hero banner. Data comes from the Nagara indexer `/price` endpoint, fetched server-side through the `/node-api/nagara-price` route (the indexer does not send CORS headers). The `network` query param is `testnet` when `NEXT_PUBLIC_IS_TESTNET` is `true`, and `mainnet` otherwise.
+
+| Variable | Type | Description | Compulsoriness | Default value | Example value | Version |
+| --- | --- | --- | --- | --- | --- | --- |
+| NEXT_PUBLIC_NAGARA_PRICE_API_HOST | `string` | Nagara indexer host serving the `/price` endpoint | - | - | `https://indexer.nagara.network` | upcoming |
 
 &nbsp;
 
