@@ -150,6 +150,7 @@
 	| "open-link"
 	| "operation"
 	| "payment_link"
+	| "pie_chart_outline"
 	| "pie_chart"
 	| "plus"
 	| "private_tags"

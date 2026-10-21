@@ -7,6 +7,7 @@ import { HomeDataContextProvider } from 'src/slices/home/contexts/home-data-cont
 import { HomeRpcDataContextProvider } from 'src/slices/home/contexts/rpc-data-context';
 
 import AdBanner from 'src/features/ads/banner/components/AdBanner';
+import NagaraPriceStrip from 'src/features/nagara-price/components/NagaraPriceStrip';
 import LatestArbitrumL2Batches from 'src/features/rollup/arbitrum/pages/home/LatestArbitrumL2Batches';
 
 import config from 'src/config';
@@ -40,6 +41,7 @@ const Home = () => {
       <HomeRpcDataContextProvider>
         <Box as="main">
           <HeroBanner/>
+          { config.features.nagaraPrice.isEnabled && <NagaraPriceStrip mt={ 3 }/> }
           <Flex flexDir={{ base: 'column', lg: 'row' }} columnGap={ 2 } rowGap={ 1 } mt={ 3 } _empty={{ mt: 0 }}>
             <HomeStats/>
             <ChainIndicators/>
