@@ -45,9 +45,8 @@ const NagaraPriceStrip = (props: GridProps) => {
       <StatsWidget
         label="Total supply"
         icon="navigation/tokens"
-        value={ formatCompact(data.totalIssuance) }
+        value={ data.totalIssuance.toLocaleString() }
         valuePostfix={ ` ${ data.symbol }` }
-        hint={ `${ data.totalIssuance.toLocaleString() } ${ data.symbol }` }
         isLoading={ isPlaceholderData }
       />
       <StatsWidget
